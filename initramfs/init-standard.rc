@@ -120,7 +120,12 @@ loglevel 3
 ###################################################################    
 # create SEC_INTERNAL_STORAGE 2/2   
 ##    mount ext3 /dev/block/mmcblk0p1 /userdata nosuid nodev
-    mount rfs /dev/block/mmcblk0p2 /data nosuid nodev check=no
+mkdir /dbdata
+mkdir /sdext
+mount vfat /dev/block/mmcblk0p1 /sdcard
+mount vfat /dev/block/mmcblk1p1 /sdext
+start user_early_init
+write /sync_fifo sync
     chown system system /data
     chmod 0771 /data
    
@@ -128,8 +133,6 @@ loglevel 3
 
 ###################################################################    
 # create dbdata partition
-mkdir /dbdata
-mount rfs /dev/block/stl10 /dbdata nosuid nodev check=no
 mkdir /dbdata/databases
 chown system system /dbdata
 chown system system /dbdata/databases
@@ -169,6 +172,7 @@ chmod 0777 /dbdata/databases
     #chmod 0777 /system/bin/gpsd/glgps_samsungJupiter
     #chmod 0666 /system/lib/libgps.so
     chmod 600 /system/etc/secgps.conf
+    chmod 6777 /system/bin/brcm_dutMode
     
 # create basic filesystem structure
     mkdir /data/misc 01771 system misc
@@ -329,6 +333,8 @@ on boot
 
 # Define the oom_adj values for the classes of processes that can be
 # killed by the kernel.  These are used in ActivityManagerService.
+    setprop ro.secure 1
+    setprop ro.debuggable 0
     setprop ro.FOREGROUND_APP_ADJ 0
     setprop ro.VISIBLE_APP_ADJ 1
     setprop ro.SECONDARY_SERVER_ADJ 2
@@ -493,13 +499,22 @@ on boot
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chown bluetooth bluetooth /sys/class/rfkill/rfkill1/state 
 
-    chmod 6777 /system/bin/brcm_dutMode
 # +++++++++++++++++++++++++++++++++++++++++++
 
+    start user_init
+    write /sync_fifo
     class_start default
 
 ## Daemon processes to be run by init.
 ##
+service user_early_init /sbin/init.d/user_early_init.sh
+    oneshot
+    disabled
+
+service user_init /sbin/init.d/user_init.sh
+    oneshot
+    disabled
+
 service console /system/bin/sh
     console
 
