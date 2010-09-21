@@ -28,7 +28,7 @@ fi
 echo $(date) USER EARLY INIT DONE
 # Do this here instead of back in init.rc so that it can be conditional on the
 # target not already being a mount point.
-if ! mount -t none -o remount none /data >/dev/null 2>&1 ; then
+if ! grep ' /data ' /proc/mounts >/dev/null 2>&1 ; then
     echo "MOUNT /data"
     if mount -t rfs -o noatime,nosuid,nodev,check=no /dev/block/mmcblk0p2 /data ; then
         echo "SUCCESS"
@@ -36,7 +36,7 @@ if ! mount -t none -o remount none /data >/dev/null 2>&1 ; then
         echo "FAILURE ($?)"
     fi
 fi
-if ! mount -t none -o remount none /dbdata >/dev/null 2>&1 ; then
+if ! grep ' /dbdata ' /proc/mounts >/dev/null 2>&1 ; then
     echo "MOUNT /dbdata"
     if mount -t rfs -o noatime,nosuid,nodev,check=no /dev/block/stl10 /dbdata ; then
         echo "SUCCESS"
