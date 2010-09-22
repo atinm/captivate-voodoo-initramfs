@@ -124,8 +124,6 @@ mkdir /dbdata
 mkdir /sdext
 mount vfat /dev/block/mmcblk0p1 /sdcard
 mount vfat /dev/block/mmcblk1p1 /sdext
-start user_early_init
-write /sync_fifo sync
     chown system system /data
     chmod 0771 /data
    
@@ -501,19 +499,16 @@ on boot
 
 # +++++++++++++++++++++++++++++++++++++++++++
 
-    start user_init
-    write /sync_fifo sync
+    start sysinit
     class_start default
 
 ## Daemon processes to be run by init.
 ##
-service user_early_init /sbin/init.d/user_early_init.sh
-    oneshot
-    disabled
 
-service user_init /sbin/init.d/user_init.sh
-    oneshot
-    disabled
+# Execute files in /etc/init.d before booting
+service sysinit /system/bin/logwrapper /system/xbin/busybox run-parts /system/etc/init.d
+disabled
+oneshot
 
 service console /system/bin/sh
     console
