@@ -120,7 +120,6 @@ loglevel 3
 ###################################################################    
 # create SEC_INTERNAL_STORAGE 2/2   
 ##    mount ext3 /dev/block/mmcblk0p1 /userdata nosuid nodev
-
 ## Voodoo here - we already mounted /data in init.sh!
 #    mount rfs /dev/block/mmcblk0p2 /data nosuid nodev check=no
     chown system system /data
